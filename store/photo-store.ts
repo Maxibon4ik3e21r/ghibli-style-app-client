@@ -8,11 +8,12 @@ interface PhotoState {
   addPhoto: (photo: Photo) => void;
   updatePhoto: (id: string, updates: Partial<Photo>) => void;
   deleteAllPhotos: () => void;
+  getPhotoByOriginalUrl: (url: string) => Photo | undefined;
 }
 
 export const usePhotoStore = create<PhotoState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       photos: [],
       addPhoto: (photo) => set((state) => ({ 
         photos: [photo, ...state.photos] 
@@ -23,6 +24,13 @@ export const usePhotoStore = create<PhotoState>()(
         )
       })),
       deleteAllPhotos: () => set({ photos: [] }),
+      getPhotoByOriginalUrl: (url) => {
+        return get().photos.find(photo => 
+          photo.originalUrl === url && 
+          photo.status === 'completed' &&
+          photo.transformedUrl
+        );
+      }
     }),
     {
       name: 'ghibli-photos-storage',
